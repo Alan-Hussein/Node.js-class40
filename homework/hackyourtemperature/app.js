@@ -8,22 +8,19 @@ app.get("/", (req, res) => {
   res.end("hello from backend to frontend!");
 });
 
-app.post("/weather", (req, res) => {
+app.post("/weather", async (req, res) => {
   const city = req.body.cityName;
-  fetch(
-    `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${keys.API_KEY}`
-    
-  )
-    .then((response) => response.json())
-    .then((data) => {
-      if (city) {
-        res.json({
-          weatherText: `${data.name} , ${Math.round(data.main.temp)} °C`,
-        });
-      } else {
-        res.status(400).json({ weatherText: "City is not found!" });
-      }
+  try {
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${keys.API_KEY}`
+    );
+    const data = await response.json();
+    res.json({
+      weatherText: `${data.name} , ${Math.round(data.main.temp)} °C`,
     });
+  } catch (err) {
+    res.status(404).json({ weatherText: "Error!" });
+  }
 });
 
 export default app;
